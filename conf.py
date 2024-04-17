@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
-from classificators import age_binding, BMI_ranges
+
+from classificators import BMI_ranges, age_binding
 from custom import fix_places
 
 sns.set_theme(style="whitegrid", rc={'figure.figsize': (14, 8), 'axes.labelsize': 15})
@@ -146,12 +147,13 @@ activity_col = [
 ]
 
 
-def structure(x):
+def structure(x: 'Loader'):
     """Define report structure."""
+
+    #Aliases
     f = 'file'
     l = 'load'
     g = 'gen'
-
     t = 'table'
     p = 'plot'
     d = 'desc'
@@ -161,6 +163,7 @@ def structure(x):
     xg = 'global'
     xs = 'static'
     xp = 'paraphrase'
+
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
@@ -177,13 +180,11 @@ def structure(x):
                     x.obj(l, d, 'metric', loc='pre'),
                     x.obj(t, g, ['Sex']),
                     x.obj(l, d, 'table', xr),
-
                 ],
                 "Wiek" : [
                     x.obj(t, g, ['Age']),
                     x.obj(l, d, 'table', xr),
                     x.obj(p, g, ['CAge']),
-
                 ],
                 "BMI" : [
                     x.obj(t, g, ['H', 'M']),
