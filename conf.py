@@ -16,6 +16,14 @@ crv = {
     "Very Strong": 0.25,
 }
 
+multiple_col = [
+    "Aktywności poza pracą",
+    "Utrudnienia w ruchu podczas bólu w czynnościach:",
+    "Rodzaj aktywności fizycznej",
+    "Charakter bólu",
+    "Kiedy ból mija",
+]
+
 nominal_data = [
     "Płeć",
     'Stan cywilny',
@@ -69,14 +77,15 @@ quantitative_data = [
 metric_col = [
     "Płeć",
     "Wiek",
-    "Miejsce zamieszkania",
+    "Kategoria wiekowa",
     "Wzrost [cm]",
     "Masa ciała [kg]",
     "Wartość BMI",
     "BMI",
-    "Kategoria wiekowa",
+    "Miejsce zamieszkania",
     'Stan cywilny',
 ]
+
 
 inpact_col = [
     "Utrudnienia w ruchu podczas bólu w czynnościach:",
@@ -118,12 +127,4 @@ activity_col = [
     "Aktywność fizyczna",
     "Ile minut aktywności fiz. w tyg.",
     "Rodzaj aktywności fizycznej",
-]
-
-multiple_col = [
-    "Aktywności poza pracą",
-    "Utrudnienia w ruchu podczas bólu w czynnościach:",
-    "Rodzaj aktywności fizycznej",
-    "Charakter bólu",
-    "Kiedy ból mija",
 ]
