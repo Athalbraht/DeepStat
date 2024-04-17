@@ -205,12 +205,7 @@ def structure(x):
         },
         "Analiza danych" : {
             "Znaczenie uwarunkowań socjo-demograficznych" : None,
-            "Wpływ bólu kręgosłupa na jakość życia" : [
-                x.add_desc(
-                    l.from_file("methods.tex"),
-                    'pre',
-                ),
-            ],
+            "Wpływ bólu kręgosłupa na jakość życia" : None,
             "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : None,
             "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : None,
         },
