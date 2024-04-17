@@ -1,4 +1,7 @@
+import pandas as pd
 import seaborn as sns
+from classificators import age_binding, BMI_ranges
+from custom import fix_places
 
 sns.set_theme(style="whitegrid", rc={'figure.figsize': (14, 8), 'axes.labelsize': 15})
 sns_api = {'height': 6, 'aspect': 1.75}
@@ -7,6 +10,19 @@ pic_ext = "pdf"
 tab_path = "report/tabs"
 pval = 0.05
 
+tex_config = {
+    "filename" : 'report',
+    "ext" : '.tex',
+    "folder" : 'output',
+    "template" : 'views/document.tex',
+    "responses" : 'responses.csv',
+    "TITLE" : 'Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego',
+    "AUTHOR" : 'Aleksandra Żaba',
+}
+
+stat_tests = {
+    'qq' : 'pass'
+}
 
 crv = {
     "Very weak": 0,
@@ -128,3 +144,103 @@ activity_col = [
     "Ile minut aktywności fiz. w tyg.",
     "Rodzaj aktywności fizycznej",
 ]
+
+
+def structure(x, l):
+    """Define report structure."""
+    f = 'file'
+    l = 'load'
+    g = 'gen'
+
+    t = 'table'
+    p = 'plot'
+    d = 'desc'
+
+    xr = 'random'
+    xu = 'uniqe'
+    xg = 'global'
+    xs = 'static'
+    xp = 'paraphrase'
+    tex_structure = {
+        "Metodyka Badań" : {
+            "Pytania badawcze" : [
+                x.obj(f, d, 'methods.tex', loc='pre'),
+                x.obj(f, d, 'questions.tex'),
+            ],
+            "Metoda statystyczna" : [
+                x.obj(l, d, 'methods')
+            ],
+        },
+        "Dane metryczne" : {
+            "Metryka" : {
+                "Płeć" : [
+                    x.obj(l, d, 'metric', loc='pre'),
+                    x.obj(t, g, ['Sex']),
+                    x.obj(l, d, 'table', xr),
+
+                ],
+                "Wiek" : [
+                    x.obj(t, g, ['Age']),
+                    x.obj(l, d, 'table', xr),
+                    x.obj(p, g, ['CAge']),
+
+                ],
+                "BMI" : [
+                    x.obj(t, g, ['H', 'M']),
+                    x.obj(t, g, ['CBMI']),
+                    x.obj(l, d, 'table', xr),
+
+                ],
+            },
+            "Warunki socjodemograficzne" : {
+                "Miejsce zamieszkania" : None,
+                "Stan cywilny" : None,
+            },
+            "Aktywność fizyczna" : None,
+        },
+        "Przegląd wyników ankieyty" : {
+            "Występowanie bólu kręgosłupa" : None,
+            "Zatrudnienie i warunki pracy" : None,
+            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : None,
+        },
+        "Analiza danych" : {
+            "Znaczenie uwarunkowań socjo-demograficznych" : None,
+            "Wpływ bólu kręgosłupa na jakość życia" : [
+                x.add_desc(
+                    l.from_file("methods.tex"),
+                    'pre',
+                ),
+            ],
+            "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : None,
+            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : None,
+        },
+        "Wnioski" : None,
+    }
+    return tex_structure
+
+
+def data_loader(data):
+    """Load and prepare data."""
+    df = pd.read_excel(data)
+    pre_n = len(df)
+    print("Loaded {} entries".format(pre_n))
+    print("- Clearing nan values")
+    df.dropna(inplace=True)
+    df.reset_index()
+    df["Ból VAS"] = df["Ból VAS"].astype(int)
+    n = pre_n - len(df)
+    print("\t - Droped {} entries {}%".format(n, round(len(df) / pre_n * 100)))
+    print("- fixing duty column")
+    #   df['Godziny przepracowane w tygodniu'] = df['Godziny przepracowane w tygodniu'].apply(duty_clear)
+    print("- Converting multiple choice columns to list")
+    for col in multiple_col:
+        df[col] = df[col].apply(lambda x: x.split(';')[:-1])
+    print("- Calc BMI values")
+    df["Wartość BMI"] = df["Masa ciała [kg]"] / (df["Wzrost [cm]"] / 100) ** 2
+    df["BMI"] = df["Wartość BMI"].apply(BMI_ranges)
+    df["Kategoria wiekowa"] = df["Wiek"].apply(age_binding)
+    print("- Cleared, numerical values description:")
+    print("- Fixing places")
+    df['Rodzaj oddziału'] = df['Oddział'].apply(fix_places)
+    df[["Wiek", "Masa ciała [kg]", "Wzrost [cm]", "Wartość BMI"]].describe().round()
+    return df
