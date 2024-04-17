@@ -146,7 +146,7 @@ activity_col = [
 ]
 
 
-def structure(x, l):
+def structure(x):
     """Define report structure."""
     f = 'file'
     l = 'load'
