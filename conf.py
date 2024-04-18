@@ -167,29 +167,29 @@ def structure(x: 'Loader'):
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                x.obj(f, d, 'methods.tex', loc='pre'),
-                x.obj(f, d, 'questions.tex'),
+                x.register(f, d, 'methods.tex', loc='pre'),
+                x.register(f, d, 'questions.tex'),
             ],
             "Metoda statystyczna" : [
-                x.obj(l, d, 'methods')
+                x.register(l, d, 'methods')
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    x.obj(l, d, 'metric', loc='pre'),
-                    x.obj(t, g, ['Sex']),
-                    x.obj(l, d, 'table', xr),
+                    x.register(l, d, 'metric', loc='pre'),
+                    x.register(t, g, ['Sex']),
+                    x.register(l, d, 'table', xr),
                 ],
                 "Wiek" : [
-                    x.obj(t, g, ['Age']),
-                    x.obj(l, d, 'table', xr),
-                    x.obj(p, g, ['CAge']),
+                    x.register(t, g, ['Age']),
+                    x.register(l, d, 'table', xr),
+                    x.register(p, g, ['CAge']),
                 ],
                 "BMI" : [
-                    x.obj(t, g, ['H', 'M']),
-                    x.obj(t, g, ['CBMI']),
-                    x.obj(l, d, 'table', xr),
+                    x.register(t, g, ['H', 'M']),
+                    x.register(t, g, ['CBMI']),
+                    x.register(l, d, 'table', xr),
 
                 ],
             },
