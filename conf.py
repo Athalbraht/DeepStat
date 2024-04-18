@@ -1,28 +1,60 @@
+import os
 import pandas as pd
 import seaborn as sns
+from typing import TypeVar
 
 from classificators import BMI_ranges, age_binding
 from custom import fix_places
+from addons import read_file
 
-sns.set_theme(style="whitegrid", rc={'figure.figsize': (14, 8), 'axes.labelsize': 15})
-sns_api = {'height': 6, 'aspect': 1.75}
+sns.set_theme(style="whitegrid", rc={"figure.figsize": (14, 8), "axes.labelsize": 15})
+sns_api = {"height": 6, "aspect": 1.75}
 pic_path = "report/assets"
 pic_ext = "pdf"
 tab_path = "report/tabs"
 pval = 0.05
 
+templates_folder = "views/"
+
+
+def template(x):
+    abs_path = os.path.abspath(templates_folder)
+    return os.path.join(abs_path, x)
+
+
 tex_config = {
-    "filename" : 'report',
-    "ext" : '.tex',
-    "folder" : 'output',
-    "template" : 'views/document.tex',
-    "responses" : 'responses.csv',
-    "TITLE" : 'Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego',
-    "AUTHOR" : 'Aleksandra Żaba',
+    "folder" : "output",
+    "filename" : "report",
+    "ext" : ".tex",
+    "responses" : "responses.csv",
+    "preload_alias" : "%%PRELOAD%%",
+    "payload_alias" : "%%PAYLOAD%%",
+    "postload_alias" : "%%POSTLOAD%%",
+    "decorator" : None,
+    "lock" : False,
+    "watermark" : True,
+    "templates" : {
+        "scheme" : template("document.tex"),
+        "table" : template("table.tex"),
+        "plot" : template("graphic.tex"),
+        "text" : template("views/text.tex"),
+    },
+    "constants" : {
+        "LANGUAGE" : "polish",
+        "DOCUMENT_CLASS" : "article",
+        "MARIGIN_TOP" : "2cm",
+        "MARIGIN_BOTTOM`" : "2cm",
+        "MARIGIN_LEFT" : "3cm",
+        "MARIGIN_RIGHT" : "3cm",
+        "FONTS" : "lmodern",  # examples https://www.overleaf.com/learn/latex/Font_typefaces
+
+        "TITLE" : "Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego",
+        "AUTHOR" : "Aleksandra Żaba",
+    },
 }
 
 stat_tests = {
-    'qq' : 'pass'
+    "qq" : "pass"
 }
 
 crv = {
@@ -43,7 +75,7 @@ multiple_col = [
 
 nominal_data = [
     "Płeć",
-    'Stan cywilny',
+    "Stan cywilny",
     "Oddział",
     "Rodzaj oddziału",
     "Dodatkowa praca",
@@ -100,7 +132,7 @@ metric_col = [
     "Wartość BMI",
     "BMI",
     "Miejsce zamieszkania",
-    'Stan cywilny',
+    "Stan cywilny",
 ]
 
 
@@ -146,50 +178,51 @@ activity_col = [
     "Rodzaj aktywności fizycznej",
 ]
 
+T = TypeVar("T")
 
-def structure(x: 'Loader'):
+
+def structure(comm : T):
     """Define report structure."""
+    ff = "file"
+    ll = "load"
+    gg = "gen"
 
-    #Aliases
-    f = 'file'
-    l = 'load'
-    g = 'gen'
-    t = 'table'
-    p = 'plot'
-    d = 'desc'
+    ta = "table"
+    pl = "plot"
+    de = "desc"
 
-    xr = 'random'
-    xu = 'uniqe'
-    xg = 'global'
-    xs = 'static'
-    xp = 'paraphrase'
+    xr = "random"       # choice randomly from database
+    xu = "uniqe"        # always regenerate description
+    xg = "global"       # use global setting
+    xs = "static"       # AI support disabled, using default values
+    xp = "paraphrase"   # paraphrase existing description
 
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                x.register(f, d, 'methods.tex', loc='pre'),
-                x.register(f, d, 'questions.tex'),
+                comm.register(ff, de, "methods.tex", loc="pre"),
+                comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
-                x.register(l, d, 'methods')
+                comm.register(ll, de, "methods")
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    x.register(l, d, 'metric', loc='pre'),
-                    x.register(t, g, ['Sex']),
-                    x.register(l, d, 'table', xr),
+                    comm.register(ll, de, "metric", loc="pre"),
+                    comm.register(ta, gg, ["Sex"]),
+                    comm.register(ll, de, "table", xr),
                 ],
                 "Wiek" : [
-                    x.register(t, g, ['Age']),
-                    x.register(l, d, 'table', xr),
-                    x.register(p, g, ['CAge']),
+                    comm.register(ta, gg, ["Age"]),
+                    comm.register(ll, de, "table", xr),
+                    comm.register(pl, gg, ["CAge"]),
                 ],
                 "BMI" : [
-                    x.register(t, g, ['H', 'M']),
-                    x.register(t, g, ['CBMI']),
-                    x.register(l, d, 'table', xr),
+                    comm.register(ta, gg, ["H", "M"]),
+                    comm.register(ta, gg, ["CBMI"]),
+                    comm.register(ll, de, "table", xr),
 
                 ],
             },
@@ -227,16 +260,16 @@ def data_loader(data):
     n = pre_n - len(df)
     print("\t - Droped {} entries {}%".format(n, round(len(df) / pre_n * 100)))
     print("- fixing duty column")
-    #   df['Godziny przepracowane w tygodniu'] = df['Godziny przepracowane w tygodniu'].apply(duty_clear)
+    #   df["Godziny przepracowane w tygodniu"] = df["Godziny przepracowane w tygodniu"].apply(duty_clear)
     print("- Converting multiple choice columns to list")
     for col in multiple_col:
-        df[col] = df[col].apply(lambda x: x.split(';')[:-1])
+        df[col] = df[col].apply(lambda x: x.split(";")[:-1])
     print("- Calc BMI values")
     df["Wartość BMI"] = df["Masa ciała [kg]"] / (df["Wzrost [cm]"] / 100) ** 2
     df["BMI"] = df["Wartość BMI"].apply(BMI_ranges)
     df["Kategoria wiekowa"] = df["Wiek"].apply(age_binding)
     print("- Cleared, numerical values description:")
     print("- Fixing places")
-    df['Rodzaj oddziału'] = df['Oddział'].apply(fix_places)
+    df["Rodzaj oddziału"] = df["Oddział"].apply(fix_places)
     df[["Wiek", "Masa ciała [kg]", "Wzrost [cm]", "Wartość BMI"]].describe().round()
     return df
