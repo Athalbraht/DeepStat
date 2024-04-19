@@ -1,11 +1,11 @@
 import os
+from typing import TypeVar
+
 import pandas as pd
 import seaborn as sns
-from typing import TypeVar
 
 from classificators import BMI_ranges, age_binding
 from custom import fix_places
-from addons import read_file
 
 sns.set_theme(style="whitegrid", rc={"figure.figsize": (14, 8), "axes.labelsize": 15})
 sns_api = {"height": 6, "aspect": 1.75}
@@ -13,6 +13,7 @@ pic_path = "report/assets"
 pic_ext = "pdf"
 tab_path = "report/tabs"
 pval = 0.05
+
 
 templates_folder = "views/"
 
@@ -23,16 +24,18 @@ def template(x):
 
 
 tex_config = {
-    "folder" : "output",
+    "folder" : "output/report",
     "filename" : "report",
     "ext" : ".tex",
     "responses" : "responses.csv",
     "preload_alias" : "%%PRELOAD%%",
-    "payload_alias" : "%%PAYLOAD%%",
+    "payload_alias" : "\iffalse PAYLOAD \fi",
     "postload_alias" : "%%POSTLOAD%%",
     "decorator" : None,
     "lock" : False,
     "watermark" : True,
+    "assets_folder" : os.path.abspath("data/static"),
+    "templates_folder" : os.path.abspath(templates_folder),
     "templates" : {
         "scheme" : template("document.tex"),
         "table" : template("table.tex"),
@@ -40,17 +43,22 @@ tex_config = {
         "text" : template("views/text.tex"),
     },
     "constants" : {
-        "LANGUAGE" : "polish",
-        "DOCUMENT_CLASS" : "article",
-        "MARIGIN_TOP" : "2cm",
-        "MARIGIN_BOTTOM`" : "2cm",
-        "MARIGIN_LEFT" : "3cm",
-        "MARIGIN_RIGHT" : "3cm",
-        "FONTS" : "lmodern",  # examples https://www.overleaf.com/learn/latex/Font_typefaces
+        "%%LANGUAGE%%" : "polish",
+        "%%DOCUMENT_CLASS%%" : "article",
+        "%%MARIGIN_TOP%%" : "2cm",
+        "%%MARIGIN_BOTTOM%%`" : "2cm",
+        "%%MARIGIN_LEFT%%" : "3cm",
+        "%%MARIGIN_RIGHT%%" : "3cm",
+        "%%FONT%%" : "lmodern",  # examples https://www.overleaf.com/learn/latex/Font_typefaces
 
-        "TITLE" : "Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego",
-        "AUTHOR" : "Aleksandra Żaba",
+        "%%TITLE%%" : "Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego",
+        "%%AUTHOR%%" : "Aleksandra Żaba",
     },
+    "latex" : {
+        "executable" : "pdflatex",
+        "options" : "-interaction=indent",
+    }
+
 }
 
 stat_tests = {
