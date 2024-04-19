@@ -29,7 +29,7 @@ tex_config = {
     "ext" : ".tex",
     "responses" : "responses.csv",
     "preload_alias" : "%%PRELOAD%%",
-    "payload_alias" : "\iffalse PAYLOAD \fi",
+    "payload_alias" : "\\iffalse PAYLOAD \\fi",
     "postload_alias" : "%%POSTLOAD%%",
     "decorator" : None,
     "lock" : False,
@@ -40,13 +40,14 @@ tex_config = {
         "scheme" : template("document.tex"),
         "table" : template("table.tex"),
         "plot" : template("graphic.tex"),
-        "text" : template("views/text.tex"),
+        "text" : template("text.tex"),
+        "desc" : template("text.tex"),
     },
     "constants" : {
         "%%LANGUAGE%%" : "polish",
         "%%DOCUMENT_CLASS%%" : "article",
         "%%MARIGIN_TOP%%" : "2cm",
-        "%%MARIGIN_BOTTOM%%`" : "2cm",
+        "%%MARIGIN_BOTTOM%%" : "2cm",
         "%%MARIGIN_LEFT%%" : "3cm",
         "%%MARIGIN_RIGHT%%" : "3cm",
         "%%FONT%%" : "lmodern",  # examples https://www.overleaf.com/learn/latex/Font_typefaces
@@ -208,34 +209,39 @@ def structure(comm : T):
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                comm.register(ff, de, "methods.tex", loc="pre"),
+                comm.register(ff, de, "methods.tex",loc='pre'),
                 comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
-                comm.register(ll, de, "methods")
+                comm.register(ff, de, "methods.tex"),
+                comm.register(ff, de, "questions.tex"),
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    comm.register(ll, de, "metric", loc="pre"),
-                    comm.register(ta, gg, ["Sex"]),
-                    comm.register(ll, de, "table", xr),
+                    comm.register(ff, de, "methods.tex"),
+                    comm.register(ff, de, "questions.tex"),
+                    comm.register(ff, de, "questions.tex"),
                 ],
                 "Wiek" : [
-                    comm.register(ta, gg, ["Age"]),
-                    comm.register(ll, de, "table", xr),
-                    comm.register(pl, gg, ["CAge"]),
+                    comm.register(ff, de, "methods.tex"),
+                    comm.register(ff, de, "questions.tex"),
                 ],
                 "BMI" : [
-                    comm.register(ta, gg, ["H", "M"]),
-                    comm.register(ta, gg, ["CBMI"]),
-                    comm.register(ll, de, "table", xr),
+                    comm.register(ff, de, "methods.tex"),
+                    comm.register(ff, de, "questions.tex"),
+                    comm.register(ff, de, "methods.tex",),
+                    comm.register(ff, de, "questions.tex"),
 
                 ],
             },
             "Warunki socjodemograficzne" : {
-                "Miejsce zamieszkania" : None,
+                "Miejsce zamieszkania" : [
+                    comm.register(ff, de, "methods.tex"),
+                    comm.register(ff, de, "questions.tex"),
+
+                ],
                 "Stan cywilny" : None,
             },
             "Aktywność fizyczna" : None,
