@@ -27,7 +27,7 @@ tex_config = {
     "folder" : "output/report",
     "filename" : "report",
     "ext" : ".tex",
-    "responses" : "responses.csv",
+    "responses_file" : "responses.csv",
     "preload_alias" : "%%PRELOAD%%",
     "payload_alias" : "\\iffalse PAYLOAD \\fi",
     "postload_alias" : "%%POSTLOAD%%",
@@ -55,7 +55,8 @@ tex_config = {
         "%%TITLE%%" : "Badanie wpływu bólu kręgosłupa na jakość życia wśród personelu pielęgniarskiego",
         "%%AUTHOR%%" : "Aleksandra Żaba",
     },
-    "latex" : {
+    "compile" : {
+        "method" : "latex",
         "executable" : "pdflatex",
         "options" : "-interaction=indent",
     }
@@ -209,7 +210,7 @@ def structure(comm : T):
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                comm.register(ff, de, "methods.tex",loc='pre'),
+                comm.register(ff, de, "methods.tex", loc='pre'),
                 comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
