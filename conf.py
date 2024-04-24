@@ -113,6 +113,18 @@ nominal_data = [
     "Kiedy ból mija",
 ]
 
+ind_data = [
+    "Płeć",
+    "Stan cywilny",
+    "Rodzaj oddziału",
+    "Dodatkowa praca",
+    "Udogodnienia (w miejscu pracy)",
+    "Prawidłowa postawa ciała w pracy",
+    "Możliwość planowania przerw",
+    "Czy środowisko pracy jest zdrowe? (opinia)",
+
+        ]
+
 ordinal_data = [
     "Miejsce zamieszkania",
     "BMI",
@@ -198,8 +210,10 @@ def structure(comm : T):
     gg = "gen"
 
     ta = "table"
+    cta = "crosstable"
     pl = "plot"
     de = "desc"
+    fp = 'prompt'
 
     xr = "random"       # choice randomly from database
     xu = "uniqe"        # always regenerate description
@@ -214,15 +228,14 @@ def structure(comm : T):
                 comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
-                comm.register(ff, de, "methods.tex"),
-                comm.register(ff, de, "questions.tex"),
+                comm.register(ff, de, "methods.tex"), #TODO SUMMARY STAT
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    comm.register(ff, de, "methods.tex"),
-                    comm.register(ff, de, "questions.tex"),
+                    comm.register(ff, de, "metric.tex", loc='pre'),
+                    comm.register(gg, ta, metric_col),
                     comm.register(ff, de, "questions.tex"),
                 ],
                 "Wiek" : [
@@ -247,7 +260,7 @@ def structure(comm : T):
             },
             "Aktywność fizyczna" : None,
         },
-        "Przegląd wyników ankieyty" : {
+        "Przegląd wyników ankiety" : {
             "Występowanie bólu kręgosłupa" : None,
             "Zatrudnienie i warunki pracy" : None,
             "Wpływ bólu na fizyczne i psychiczne aspekty życia" : None,
