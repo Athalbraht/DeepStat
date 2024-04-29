@@ -4,6 +4,7 @@ from typing import TypeVar
 import pandas as pd
 import seaborn as sns
 
+from alias import c
 from classificators import BMI_ranges, age_binding
 from custom import fix_places
 
