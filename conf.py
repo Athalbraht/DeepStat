@@ -41,10 +41,12 @@ tex_config = {
         "scheme" : template("document.tex"),
         "table" : template("table.tex"),
         "desctable" : template("desctable.tex"),
+        "powertable" : template("desctable.tex"),
         "counttable" : template("desctable.tex"),
         "expandtable" : template("desctable.tex"),
         "crosstable" : template("desctable.tex"),
         "plot" : template("graphic.tex"),
+        "powerplot" : template("graphic.tex"),
         "text" : template("text.tex"),
         "desc" : template("text.tex"),
     },
@@ -68,7 +70,7 @@ tex_config = {
     "ai" : {
         'mode' : 'uniqe',
         'model' : "gpt-3.5-turbo-0125",
-        #'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
+        # 'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
         'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp."
     }
 
@@ -123,9 +125,6 @@ nominal_data = [
     "Charakter bólu",
     "Kiedy ból mija",
 ]
-
-
-
 
 
 ind_data = [
@@ -240,6 +239,7 @@ tmp2 = [
 
 cross = []
 
+
 def structure(comm : T):
     """Define report structure."""
     ff = "file"
@@ -271,6 +271,9 @@ def structure(comm : T):
             ],
             "Metoda statystyczna" : [
                 comm.register(ff, de, "methods.tex"),  # TODO SUMMARY STAT
+                comm.register(gg, 'powertable', "None", alias='powertab'),  # TODO SUMMARY STAT
+                comm.register(gd, de, "powertab", mode=xg, alias='powertabD'),
+                comm.register(gg, 'powerplot', "None"),  # TODO SUMMARY STAT
                 comm.register(ss, de, '\\newpage'),
             ],
         },
