@@ -40,6 +40,7 @@ tex_config = {
     "templates" : {
         "scheme" : template("document.tex"),
         "table" : template("table.tex"),
+        "desctable" : template("desctable.tex"),
         "plot" : template("graphic.tex"),
         "text" : template("text.tex"),
         "desc" : template("text.tex"),
@@ -62,7 +63,7 @@ tex_config = {
         "options" : "",
     },
     "ai" : {
-        'mode' : 'static',
+        'mode' : 'uniqe',
     }
 
 }
@@ -212,11 +213,14 @@ def structure(comm : T):
     ff = "file"
     ll = "load"
     gg = "gen"
+    gd = "gendesc"
+    ss = "static"
 
     ta = "table"
     cta = "crosstable"
     pl = "plot"
     de = "desc"
+    det = "desctable"
     fp = 'prompt'
 
     xr = "random"       # choice randomly from database
@@ -233,17 +237,23 @@ def structure(comm : T):
             ],
             "Metoda statystyczna" : [
                 comm.register(ff, de, "methods.tex"),  # TODO SUMMARY STAT
+                comm.register(ss, de, '\\newpage'),
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    comm.register(ff, de, "methods.tex", loc='pre'),
+                    comm.register(ff, de, "metric.tex", loc='pre'),
+                    comm.register(gg, det, metric_col, loc='pre', mode=xg, alias='metricN'),
+                    comm.register(gd, de, "metricN", loc='pre', mode=xg, alias='metricND'),
+
+                    comm.register(gd, de, "Plec", mode=xg, alias='PlecD'),
+                    comm.register(gg, det, metric_col, mode=xg, alias='Plec'),
                 ],
                 "Wiek" : [
                 ],
                 "BMI" : [
-
+                    comm.register(ss, de, '\\newpage'),
                 ],
             },
             "Warunki socjodemograficzne" : {
@@ -251,18 +261,24 @@ def structure(comm : T):
                 ],
                 "Stan cywilny" : [],
             },
-            "Aktywność fizyczna" : [],
+            "Aktywność fizyczna" : [
+                comm.register(ss, de, '\\newpage'),
+            ],
         },
         "Przegląd wyników ankiety" : {
             "Występowanie bólu kręgosłupa" : [],
             "Zatrudnienie i warunki pracy" : [],
-            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [],
+            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [
+                comm.register(ss, de, '\\newpage'),
+            ],
         },
         "Analiza danych" : {
             "Znaczenie uwarunkowań socjo-demograficznych" : [],
             "Wpływ bólu kręgosłupa na jakość życia" : [],
             "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [],
-            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : [],
+            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : [
+                comm.register(ss, de, '\\newpage'),
+            ],
         },
         "Wnioski" : [],
     }
