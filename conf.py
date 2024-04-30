@@ -32,7 +32,7 @@ tex_config = {
     "preload_alias" : "%%PRELOAD%%",
     "payload_alias" : "\\iffalse PAYLOAD \\fi",
     "postload_alias" : "%%POSTLOAD%%",
-    "decorator" : None,
+    "decorator" : [],
     "lock" : False,
     "watermark" : True,
     "assets_folder" : os.path.abspath("data/static"),
@@ -124,7 +124,7 @@ ind_data = [
     "Możliwość planowania przerw",
     "Czy środowisko pracy jest zdrowe? (opinia)",
 
-        ]
+]
 
 ordinal_data = [
     "Miejsce zamieszkania",
@@ -229,50 +229,39 @@ def structure(comm : T):
                 comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
-                comm.register(ff, de, "methods.tex"), #TODO SUMMARY STAT
+                comm.register(ff, de, "methods.tex"),  # TODO SUMMARY STAT
             ],
         },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
-                    comm.register(ff, de, "metric.tex", loc='pre'),
-                    comm.register(gg, ta, metric_col),
-                    comm.register(ff, de, "questions.tex"),
+                    comm.register(ff, de, "methods.tex", loc='pre'),
                 ],
                 "Wiek" : [
-                    comm.register(ff, de, "methods.tex"),
-                    comm.register(ff, de, "questions.tex"),
                 ],
                 "BMI" : [
-                    comm.register(ff, de, "methods.tex"),
-                    comm.register(ff, de, "questions.tex"),
-                    comm.register(ff, de, "methods.tex",),
-                    comm.register(ff, de, "questions.tex"),
 
                 ],
             },
             "Warunki socjodemograficzne" : {
                 "Miejsce zamieszkania" : [
-                    comm.register(ff, de, "methods.tex"),
-                    comm.register(ff, de, "questions.tex"),
-
                 ],
-                "Stan cywilny" : None,
+                "Stan cywilny" : [],
             },
-            "Aktywność fizyczna" : None,
+            "Aktywność fizyczna" : [],
         },
         "Przegląd wyników ankiety" : {
-            "Występowanie bólu kręgosłupa" : None,
-            "Zatrudnienie i warunki pracy" : None,
-            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : None,
+            "Występowanie bólu kręgosłupa" : [],
+            "Zatrudnienie i warunki pracy" : [],
+            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [],
         },
         "Analiza danych" : {
-            "Znaczenie uwarunkowań socjo-demograficznych" : None,
-            "Wpływ bólu kręgosłupa na jakość życia" : None,
-            "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : None,
-            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : None,
+            "Znaczenie uwarunkowań socjo-demograficznych" : [],
+            "Wpływ bólu kręgosłupa na jakość życia" : [],
+            "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [],
+            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : [],
         },
-        "Wnioski" : None,
+        "Wnioski" : [],
     }
     return tex_structure
 
