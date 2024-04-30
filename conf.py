@@ -59,7 +59,10 @@ tex_config = {
     "compile" : {
         "method" : "latex",
         "executable" : "pdflatex",
-        "options" : "-interaction=indent",
+        "options" : "",
+    },
+    "ai" : {
+        'mode' : 'static',
     }
 
 }
