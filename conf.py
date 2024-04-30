@@ -11,7 +11,7 @@ from custom import fix_places
 sns.set_theme(style="whitegrid", rc={"figure.figsize": (14, 8), "axes.labelsize": 15})
 sns_api = {"height": 6, "aspect": 1.75}
 pic_path = "report/assets"
-pic_ext = "pdf"
+pic_ext = ".pdf"
 tab_path = "report/tabs"
 pval = 0.05
 
@@ -41,6 +41,9 @@ tex_config = {
         "scheme" : template("document.tex"),
         "table" : template("table.tex"),
         "desctable" : template("desctable.tex"),
+        "counttable" : template("desctable.tex"),
+        "expandtable" : template("desctable.tex"),
+        "crosstable" : template("desctable.tex"),
         "plot" : template("graphic.tex"),
         "text" : template("text.tex"),
         "desc" : template("text.tex"),
@@ -64,6 +67,9 @@ tex_config = {
     },
     "ai" : {
         'mode' : 'uniqe',
+        'model' : "gpt-3.5-turbo-0125",
+        #'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
+        'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp."
     }
 
 }
@@ -118,6 +124,10 @@ nominal_data = [
     "Kiedy ból mija",
 ]
 
+
+
+
+
 ind_data = [
     "Płeć",
     "Stan cywilny",
@@ -140,7 +150,6 @@ ordinal_data = [
     "Częstotliwość bólu",
     "Aktywność fizyczna",
     "Ile minut aktywności fiz. w tyg.",
-    "Ból VAS",
 ]
 
 quantitative_data = [
@@ -148,6 +157,7 @@ quantitative_data = [
     "Wzrost [cm]",
     "Masa ciała [kg]",
     "Wartość BMI",
+    "Ból VAS",
 ]
 
 metric_col = [
@@ -208,6 +218,28 @@ activity_col = [
 T = TypeVar("T")
 
 
+tmp1 = [
+    "Dodatkowa praca",
+    "Udogodnienia (w miejscu pracy)",
+    "Czy przerwy są wystarczające? (opinia)",
+    "Czy środowisko pracy jest zdrowe? (opinia)",
+    "Czy praca jest wyczerpująca fizycznie? (opinia)",
+    "Czy praca jest wyczerpująca psychicznie? (opinia)",
+]
+
+
+tmp2 = [
+    "Obowiązki domowe podczas bólu (czy jest w stanie)",
+    "Praca zawodowa podczas bólu (czy jest w stanie)",
+    "Czy unika akt. fiz. z obawy przed bólem",
+    "Problemy ze snem podczas wyst. bólu",
+    "Czy ból uniemożliwiał spotkania towarzyskie",
+    "Czy ból powodował obniżenie nastroju",
+    "Czy ból pogarsza jakość życia? (opinia)",
+]
+
+cross = []
+
 def structure(comm : T):
     """Define report structure."""
     ff = "file"
@@ -217,10 +249,12 @@ def structure(comm : T):
     ss = "static"
 
     ta = "table"
-    cta = "crosstable"
     pl = "plot"
     de = "desc"
     det = "desctable"
+    cot = "counttable"
+    ext = "expandtable"
+    crt = "crosstable"
     fp = 'prompt'
 
     xr = "random"       # choice randomly from database
@@ -247,40 +281,147 @@ def structure(comm : T):
                     comm.register(gg, det, metric_col, loc='pre', mode=xg, alias='metricN'),
                     comm.register(gd, de, "metricN", loc='pre', mode=xg, alias='metricND'),
 
+                    comm.register(ss, de, '\\newpage'),
                     comm.register(gd, de, "Plec", mode=xg, alias='PlecD'),
-                    comm.register(gg, det, metric_col, mode=xg, alias='Plec'),
+                    comm.register(gg, cot, "Płeć", mode=xg, alias='Plec'),
                 ],
                 "Wiek" : [
+                    comm.register(gg, pl, ["Wiek"], alias='Wiek', plot={'hue': "Płeć"}),
+                    comm.register(ss, de, 'Na potrzeby analizy, ankieterzy podzieleni zostali na kilka grup wiekowych (co 10 lat):'),
+                    comm.register(gg, cot, "Kategoria wiekowa", mode=xg, alias='CAge'),
+                    comm.register(ss, de, '\\newpage'),
+                    comm.register(gd, de, "CAge", mode=xg, alias='CAgeD'),
                 ],
                 "BMI" : [
+                    comm.register(gg, det, ['Wzrost [cm]'], mode=xg, alias='WzrostN', silent=True),
+                    comm.register(gd, de, "WzrostN", mode=xg, alias='WzrostND'),
+                    comm.register(gg, cot, "BMI", mode=xg, alias='CBMI'),
+                    comm.register(gd, de, "CBMI", mode=xg, alias='CBMID'),
+                    comm.register(ss, de, '\\newpage'),
+                    # comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
+                    comm.register(ss, de, 'TODO'),
+                    # comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga'),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
             "Warunki socjodemograficzne" : {
                 "Miejsce zamieszkania" : [
+                    comm.register(gg, cot, "Miejsce zamieszkania", mode=xg, alias='zamieszkanie'),
+                    comm.register(gd, de, "zamieszkanie", mode=xg, alias='zamieszkanieD'),
+                    comm.register(ss, de, '\\newpage'),
                 ],
-                "Stan cywilny" : [],
+                "Stan cywilny" : [
+                    comm.register(gg, cot, "Stan cywilny", mode=xg, alias='stanc'),
+                    comm.register(gd, de, "stanc", mode=xg, alias='stancD'),
+                    comm.register(ss, de, '\\newpage'),
+                ],
             },
             "Aktywność fizyczna" : [
+                comm.register(gg, cot, "Aktywność fizyczna", mode=xg, alias='aktf'),
+                comm.register(gd, de, "aktf", mode=xg, alias='aktfD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Ile minut aktywności fiz. w tyg.", mode=xg, alias='aktfm'),
+                comm.register(gd, de, "aktfm", mode=xg, alias='aktfmD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, ext, "Rodzaj aktywności fizycznej", mode=xg, alias='aktfrm'),
+                comm.register(gd, de, "aktfrm", mode=xg, alias='aktfrD'),
                 comm.register(ss, de, '\\newpage'),
             ],
         },
         "Przegląd wyników ankiety" : {
-            "Występowanie bólu kręgosłupa" : [],
-            "Zatrudnienie i warunki pracy" : [],
-            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [
+            "Występowanie bólu kręgosłupa" : [
+                comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", mode=xg, alias='boldawno'),
+                comm.register(gd, de, "boldawno", mode=xg, alias='boldawnoD'),
                 comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Częstotliwość bólu", mode=xg, alias='bolF'),
+                comm.register(gd, de, "bolF", mode=xg, alias='bolFD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, pl, ["Ból VAS"], alias='VAS'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, ext, "Charakter bólu", mode=xg, alias='bolcharakter'),
+                comm.register(gd, de, "bolcharakter", mode=xg, alias='bolcharakterD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, ext, "Kiedy ból mija", mode=xg, alias='kiedymija'),
+                comm.register(gd, de, "kiedymija", mode=xg, alias='kiedymijaD'),
+                comm.register(ss, de, '\\newpage'),
+            ],
+            "Zatrudnienie i warunki pracy" : [
+                comm.register(gg, cot, "Staż pracy", mode=xg, alias='stazp'),
+                comm.register(gd, de, "stazp", mode=xg, alias='stazpD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Oddział", mode=xg, alias='odd'),
+                comm.register(gd, de, "odd", mode=xg, alias='oddD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Rodzaj oddziału", mode=xg, alias='oddR'),
+                comm.register(gd, de, "oddR", mode=xg, alias='oddRD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Godziny przepracowane w tygodniu", mode=xg, alias='godzt'),
+                comm.register(gd, de, "godzt", mode=xg, alias='godztD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Prawidłowa postawa ciała w pracy", mode=xg, alias='postawa'),
+                comm.register(gd, de, "postawa", mode=xg, alias='postawaD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Możliwość planowania przerw", mode=xg, alias='planowanieprzerw'),
+                comm.register(gd, de, "planowanieprzerw", mode=xg, alias='planowanieprzerwD'),
+                comm.register(ss, de, '\\newpage'),
+
+
+                comm.register(gg, cot, "Praca pod presją czasu", mode=xg, alias='presja'),
+                comm.register(gd, de, "presja", mode=xg, alias='presjaD'),
+                comm.register(ss, de, '\\newpage'),
+
+
+                comm.register(gg, cot, tmp1, mode=xg, alias='tmp1'),
+                comm.register(gd, de, "tmp1", mode=xg, alias='tmp1D'),
+                comm.register(ss, de, '\\newpage'),
+
+
+                comm.register(gg, ext, "Aktywności poza pracą", mode=xg, alias='aktywnoscpoza'),
+                comm.register(gd, de, "aktywnoscpoza", mode=xg, alias='aktywnoscpozaD'),
+                comm.register(ss, de, '\\newpage'),
+            ],
+            "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [
+                comm.register(gg, ext, "Utrudnienia w ruchu podczas bólu w czynnościach:", mode=xg, alias='utrudnieniaruchu'),
+                comm.register(gd, de, "utrudnieniaruchu", mode=xg, alias='utrudnieniaruchuD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, tmp2, mode=xg, alias='tmp2'),
+                comm.register(gd, de, "tmp2", mode=xg, alias='tmp2D'),
+                comm.register(ss, de, '\\newpage'),
+
             ],
         },
         "Analiza danych" : {
-            "Znaczenie uwarunkowań socjo-demograficznych" : [],
-            "Wpływ bólu kręgosłupa na jakość życia" : [],
-            "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [],
             "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : [
+                comm.register(ff, de, "analysis.tex", loc='pre'),
+                comm.register(ss, de, '\\newpage'),
+            ],
+            "Znaczenie uwarunkowań socjo-demograficznych" : [
+                comm.register(ss, de, '\\newpage'),
+            ],
+            "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [
+                comm.register(ss, de, 'TODO'),
+                comm.register(ss, de, '\\newpage'),
+            ],
+            "Wpływ bólu kręgosłupa na jakość życia" : [
+                comm.register(ss, de, 'TODO'),
                 comm.register(ss, de, '\\newpage'),
             ],
         },
-        "Wnioski" : [],
+        "Wnioski" : [
+            comm.register(ss, de, 'TODO'),
+        ],
     }
     return tex_structure
 
