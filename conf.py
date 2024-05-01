@@ -112,18 +112,13 @@ nominal_data = [
     "Czy praca jest wyczerpująca psychicznie? (opinia)",
     "Czy praca jest wyczerpująca fizycznie? (opinia)",
     "Czy praca jest wyczerpująca psychicznie? (opinia)",
-    "Aktywności poza pracą",
-    "Utrudnienia w ruchu podczas bólu w czynnościach:",
     "Obowiązki domowe podczas bólu (czy jest w stanie)",
     "Praca zawodowa podczas bólu (czy jest w stanie)",
-    "Rodzaj aktywności fizycznej",
     "Czy unika akt. fiz. z obawy przed bólem",
     "Problemy ze snem podczas wyst. bólu",
     "Czy ból uniemożliwiał spotkania towarzyskie",
     "Czy ból powodował obniżenie nastroju",
     "Czy ból pogarsza jakość życia? (opinia)",
-    "Charakter bólu",
-    "Kiedy ból mija",
 ]
 
 
@@ -158,6 +153,19 @@ quantitative_data = [
     "Wartość BMI",
     "Ból VAS",
 ]
+############################################
+zw_metric = [
+    "Płeć",
+    "Wiek",
+    "Wzrost [cm]",
+    "Wartość BMI",
+    "BMI",
+]
+
+socjo_col = [
+    "Miejsce zamieszkania",
+    "Stan cywilny",
+]
 
 metric_col = [
     "Płeć",
@@ -167,10 +175,17 @@ metric_col = [
     "Masa ciała [kg]",
     "Wartość BMI",
     "BMI",
-    "Miejsce zamieszkania",
-    "Stan cywilny",
 ]
 
+# metric - pain_col
+# metric - inpact
+
+# socjo - pain /inpact
+# job_col - pain
+# job_col - inpact
+# activity - pain/inpact
+
+# pain - inpact
 
 inpact_col = [
     "Utrudnienia w ruchu podczas bólu w czynnościach:",
@@ -184,10 +199,10 @@ inpact_col = [
 
 job_col = [
     "Staż pracy",
-    "Oddział",
+    "Dodatkowa praca",
+    #   "Oddział",
     "Rodzaj oddziału",
     "Godziny przepracowane w tygodniu",
-    "Dodatkowa praca",
     "Udogodnienia (w miejscu pracy)",
     "Prawidłowa postawa ciała w pracy",
     "Możliwość planowania przerw",
@@ -406,19 +421,27 @@ def structure(comm : T):
             ],
         },
         "Analiza danych" : {
-            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : [
-                comm.register(ff, de, "analysis.tex", loc='pre'),
-                comm.register(ss, de, '\\newpage'),
-            ],
-            "Znaczenie uwarunkowań socjo-demograficznych" : [
-                comm.register(ss, de, '\\newpage'),
-            ],
+            "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : {
+                "Charakterystyka bólu" : [
+                    comm.register(ff, de, "analysis.tex", loc='pre'),
+                    comm.register(ss, de, '\\newpage'),
+                ],
+                'Wpływ na funkcje fizyczne i psychiczne': [
+                    comm.register(ss, de, '\\newpage'),
+                ]
+            },
+            "Znaczenie uwarunkowań socjo-demograficznych" : {
+                'Warunki socjalne a ból' : [
+                    comm.register(ss, de, '\\newpage'),
+                ],
+                'Znaczenie zatrudnienia' : [
+                    comm.register(ss, de, '\\newpage'),
+                ],
+            },
             "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [
-                comm.register(ss, de, 'TODO'),
                 comm.register(ss, de, '\\newpage'),
             ],
-            "Wpływ bólu kręgosłupa na jakość życia" : [
-                comm.register(ss, de, 'TODO'),
+            "Rola aktywności fizycznej" : [
                 comm.register(ss, de, '\\newpage'),
             ],
         },
