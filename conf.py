@@ -45,6 +45,8 @@ tex_config = {
         "counttable" : template("desctable.tex"),
         "expandtable" : template("desctable.tex"),
         "crosstable" : template("desctable.tex"),
+        "statcorr" : template("desctable.tex"),
+        "stattest" : template("desctable.tex"),
         "plot" : template("graphic.tex"),
         "powerplot" : template("graphic.tex"),
         "text" : template("text.tex"),
