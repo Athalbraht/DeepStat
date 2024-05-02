@@ -90,7 +90,7 @@ crv = {
     "Very Strong": 0.25,
 }
 
-multiple_col = [
+multiple_data = [
     "Aktywności poza pracą",
     "Utrudnienia w ruchu podczas bólu w czynnościach:",
     "Rodzaj aktywności fizycznej",
@@ -100,6 +100,7 @@ multiple_col = [
 
 nominal_data = [
     "Płeć",
+    "Kategoria wiekowa",
     "Stan cywilny",
     "Oddział",
     "Rodzaj oddziału",
@@ -139,7 +140,6 @@ ind_data = [
 ordinal_data = [
     "Miejsce zamieszkania",
     "BMI",
-    "Kategoria wiekowa",
     "Staż pracy",
     "Godziny przepracowane w tygodniu",
     "Od jak dawna wyst. epizody bólowe",
@@ -155,6 +155,14 @@ quantitative_data = [
     "Wartość BMI",
     "Ból VAS",
 ]
+
+type_dict = {
+    "n" : nominal_data,
+    "o" : ordinal_data,
+    "q" : quantitative_data,
+    'multi' : multiple_data,
+}
+
 ############################################
 zw_metric = [
     "Płeć",
@@ -468,7 +476,7 @@ def data_loader(data):
     print("- fixing duty column")
     #   df["Godziny przepracowane w tygodniu"] = df["Godziny przepracowane w tygodniu"].apply(duty_clear)
     print("- Converting multiple choice columns to list")
-    for col in multiple_col:
+    for col in multiple_data:
         df[col] = df[col].apply(lambda x: x.split(";")[:-1])
     print("- Calc BMI values")
     df["Wartość BMI"] = df["Masa ciała [kg]"] / (df["Wzrost [cm]"] / 100) ** 2
