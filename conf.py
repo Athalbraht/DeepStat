@@ -70,10 +70,10 @@ tex_config = {
         "options" : "",
     },
     "ai" : {
-        'mode' : 'uniqe',
+        'mode' : 'static',
         'model' : "gpt-3.5-turbo-0125",
         # 'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
-        'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp."
+        'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp. Jeśli chcesz coś wypnktować, używaj formatowania LaTex"
     }
 
 }
@@ -291,8 +291,8 @@ def structure(comm : T):
     tex_structure = {
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                comm.register(ff, de, "methods.tex", loc='pre'),
-                comm.register(ff, de, "questions.tex"),
+                comm.register(ff, de, "methods.tex", loc='pre', mode=xs),
+                comm.register(ff, de, "questions.tex", mode=xs),
             ],
             "Metoda statystyczna" : [
                 comm.register(ff, de, "methods.tex"),  # TODO SUMMARY STAT
