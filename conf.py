@@ -78,6 +78,22 @@ tex_config = {
 
 }
 
+bool_col = ['Występowanie bólu',
+            'Dodatkowa praca',
+            'Udogodnienia (w miejscu pracy)',
+            'Czy przerwy są wystarczające? (opinia)',
+            'Czy środowisko pracy jest zdrowe? (opinia)',
+            'Czy praca jest wyczerpująca fizycznie? (opinia)',
+            'Czy praca jest wyczerpująca psychicznie? (opinia)',
+            'Obowiązki domowe podczas bólu (czy jest w stanie)',
+            'Praca zawodowa podczas bólu (czy jest w stanie)',
+            'Czy unika akt. fiz. z obawy przed bólem',
+            'Problemy ze snem podczas wyst. bólu',
+            'Czy ból uniemożliwiał spotkania towarzyskie',
+            'Czy ból powodował obniżenie nastroju',
+            'Czy ból pogarsza jakość życia? (opinia)']
+
+
 stat_tests = {
     "qq" : "pass"
 }
@@ -184,18 +200,9 @@ metric_col = [
     "Wzrost [cm]",
     "Masa ciała [kg]",
     "Wartość BMI",
-    "BMI",
+    #    "BMI",
 ]
 
-# metric - pain_col
-# metric - inpact
-
-# socjo - pain /inpact
-# job_col - pain
-# job_col - inpact
-# activity - pain/inpact
-
-# pain - inpact
 
 inpact_col = [
     "Utrudnienia w ruchu podczas bólu w czynnościach:",
@@ -324,15 +331,15 @@ def structure(comm : T):
                     comm.register(ss, de, '\\newpage'),
                     comm.register(gd, de, "CAge", mode=xg, alias='CAgeD'),
                 ],
-                "BMI" : [
+                "BMI i wzrost" : [
                     comm.register(gg, det, ['Wzrost [cm]'], mode=xg, alias='WzrostN', silent=True),
                     comm.register(gd, de, "WzrostN", mode=xg, alias='WzrostND'),
-                    comm.register(gg, cot, "BMI", mode=xg, alias='CBMI'),
-                    comm.register(gd, de, "CBMI", mode=xg, alias='CBMID'),
-                    comm.register(ss, de, '\\newpage'),
-                    comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
-                    comm.register(ss, de, 'TODO'),
+                    comm.register(gg, pl, ["Płeć", "Wzrost [cm]"], alias='plec-wzrost'),
+                    # comm.register(gg, pl, ["Kategoria wiekowa", "Wzrost [cm]"], alias='wiek-wzrost'),
                     comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga'),
+                    comm.register(gd, de, "CBMI", mode=xg, alias='CBMID'),
+                    comm.register(gg, cot, "BMI", mode=xg, alias='CBMI'),
+                    comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
@@ -340,21 +347,25 @@ def structure(comm : T):
                 "Miejsce zamieszkania" : [
                     comm.register(gg, cot, "Miejsce zamieszkania", mode=xg, alias='zamieszkanie'),
                     comm.register(gd, de, "zamieszkanie", mode=xg, alias='zamieszkanieD'),
+                    comm.register(gg, pl, ["Płeć"], alias='miejscezamieszkaniaplot', plot={'hue': 'Miejsce zamieszkania'}),
                     comm.register(ss, de, '\\newpage'),
                 ],
                 "Stan cywilny" : [
                     comm.register(gg, cot, "Stan cywilny", mode=xg, alias='stanc'),
                     comm.register(gd, de, "stanc", mode=xg, alias='stancD'),
+                    comm.register(gg, pl, ["Stan cywilny"], alias='stancywilnypolot', plot={'hue': 'Płeć'}),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
             "Aktywność fizyczna" : [
                 comm.register(gg, cot, "Aktywność fizyczna", mode=xg, alias='aktf'),
                 comm.register(gd, de, "aktf", mode=xg, alias='aktfD'),
+                comm.register(gg, pl, ["Aktywność fizyczna"], alias='aktfplot', plot={'hue': 'Płeć'}),
                 comm.register(ss, de, '\\newpage'),
 
                 comm.register(gg, cot, "Ile minut aktywności fiz. w tyg.", mode=xg, alias='aktfm'),
                 comm.register(gd, de, "aktfm", mode=xg, alias='aktfmD'),
+                comm.register(gg, pl, ["Aktywność fizyczna", 'Wartość BMI'], alias='aktfplot'),
                 comm.register(ss, de, '\\newpage'),
 
                 comm.register(gg, ext, "Rodzaj aktywności fizycznej", mode=xg, alias='aktfrm'),
@@ -363,26 +374,6 @@ def structure(comm : T):
             ],
             },
         "Przegląd wyników ankiety" : {
-            "Występowanie bólu kręgosłupa" : [
-                comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", mode=xg, alias='boldawno'),
-                comm.register(gd, de, "boldawno", mode=xg, alias='boldawnoD'),
-                comm.register(ss, de, '\\newpage'),
-
-                comm.register(gg, cot, "Częstotliwość bólu", mode=xg, alias='bolF'),
-                comm.register(gd, de, "bolF", mode=xg, alias='bolFD'),
-                comm.register(ss, de, '\\newpage'),
-
-                comm.register(gg, pl, ["Ból VAS"], alias='VAS'),
-                comm.register(ss, de, '\\newpage'),
-
-                comm.register(gg, ext, "Charakter bólu", mode=xg, alias='bolcharakter'),
-                comm.register(gd, de, "bolcharakter", mode=xg, alias='bolcharakterD'),
-                comm.register(ss, de, '\\newpage'),
-
-                comm.register(gg, ext, "Kiedy ból mija", mode=xg, alias='kiedymija'),
-                comm.register(gd, de, "kiedymija", mode=xg, alias='kiedymijaD'),
-                comm.register(ss, de, '\\newpage'),
-            ],
             "Zatrudnienie i warunki pracy" : [
                 comm.register(gg, cot, "Staż pracy", mode=xg, alias='stazp'),
                 comm.register(gd, de, "stazp", mode=xg, alias='stazpD'),
@@ -390,6 +381,7 @@ def structure(comm : T):
 
                 comm.register(gg, cot, "Oddział", mode=xg, alias='odd'),
                 comm.register(gd, de, "odd", mode=xg, alias='oddD'),
+                comm.register(ss, de, 'Na potrzeby analizy przynależność do oddziałów została przegrupowana na mniejsze kategorie przy założeniu, że w każdej grupie powinno znajdować się co najmniej 5 osób. Rodzaje oddziałów przedstawione zostały w poniższej tabeli.'),
                 comm.register(ss, de, '\\newpage'),
 
                 comm.register(gg, cot, "Rodzaj oddziału", mode=xg, alias='oddR'),
@@ -402,6 +394,7 @@ def structure(comm : T):
 
                 comm.register(gg, cot, "Prawidłowa postawa ciała w pracy", mode=xg, alias='postawa'),
                 comm.register(gd, de, "postawa", mode=xg, alias='postawaD'),
+                comm.register(gg, pl, ["Prawidłowa postawa ciała w pracy"], alias='postawaplot', plot={"hue": "Płeć"}),
                 comm.register(ss, de, '\\newpage'),
 
                 comm.register(gg, cot, "Możliwość planowania przerw", mode=xg, alias='planowanieprzerw'),
@@ -423,6 +416,32 @@ def structure(comm : T):
                 comm.register(gd, de, "aktywnoscpoza", mode=xg, alias='aktywnoscpozaD'),
                 comm.register(ss, de, '\\newpage'),
             ],
+            "Występowanie bólu kręgosłupa" : [
+                comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", mode=xg, alias='boldawno'),
+                comm.register(gd, de, "boldawno", mode=xg, alias='boldawnoD'),
+                comm.register(gg, pl, ["Płeć"], alias='odjakdawnaplot', plot={'hue': 'Od jak dawna wyst. epizody bólowe'}),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, cot, "Częstotliwość bólu", mode=xg, alias='bolF'),
+                comm.register(gd, de, "bolF", mode=xg, alias='bolFD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(ss, de, 'Poniższa para histogramów przedstawia rozkład ocen bólu w skali VAS w korelacji z wiekiem ankietowanego. '),
+                comm.register(gg, pl, ["Ból VAS", "Wiek"], alias='vaswiekplot'),
+                comm.register(gg, pl, ["Ból VAS"], alias='VAS'),
+                comm.register(gg, det, ['Ból VAS'], mode=xg, alias='vasN', silent=True),
+                comm.register(gd, de, "vasN", mode=xg, alias='vasND'),
+                # acomm.register(ss, de, ''),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, ext, "Charakter bólu", mode=xg, alias='bolcharakter'),
+                comm.register(gd, de, "bolcharakter", mode=xg, alias='bolcharakterD'),
+                comm.register(ss, de, '\\newpage'),
+
+                comm.register(gg, ext, "Kiedy ból mija", mode=xg, alias='kiedymija'),
+                comm.register(gd, de, "kiedymija", mode=xg, alias='kiedymijaD'),
+                comm.register(ss, de, '\\newpage'),
+            ],
             "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [
                 comm.register(gg, ext, "Utrudnienia w ruchu podczas bólu w czynnościach:", mode=xg, alias='utrudnieniaruchu'),
                 comm.register(gd, de, "utrudnieniaruchu", mode=xg, alias='utrudnieniaruchuD'),
@@ -434,6 +453,17 @@ def structure(comm : T):
 
             ],
             },
+        # metric_col, pain_col
+        # metric - inpact
+
+        # socjo_col - pain_col
+        # socjo_col - inpact_col
+        # job_col - pain_col
+        # job_col - inpact_col
+        # activity_col - pain_col
+        # activity_col - inpact_col
+
+        # pain_col - inpact_col
         "Analiza danych" : {
             "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : {
                 "Charakterystyka bólu" : [
