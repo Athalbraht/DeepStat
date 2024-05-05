@@ -300,7 +300,7 @@ def tests_tab(ddf):
                 d2 = ', '.join(df['data'].iloc[0][-3:])
 
                 tab = pd.DataFrame(dict(zip(gr, v)))
-                caption = "Test {} dla kolumny {}. $Q$ i $IRQ$ to kolejno mediana oraz rozstęp międzykwartylowy, {} - Wartość statystyki, p-value oraz wskaźnik siły efektu".format(
+                caption = "Test {} dla grupy {}. {} to kolejno mediana oraz rozstęp międzykwartylowy, {} - Wartość statystyki, p-value oraz wskaźnik siły efektu".format(
                     test, group, d1, d2)
                 tables.append(tab)
             except:
@@ -507,7 +507,7 @@ def structure(comm : T, df, make_stat, power):
                     comm.register(ff, de, "analysis.tex", loc='pre'),
                     comm.register(ss, de, '\\newpage'),
                 ]
-                + make_stat(comm, df, metric_col, pain_col, power, xu),
+r               + make_stat(comm, df, metric_col, pain_col, power, xu),
                 'Wpływ na funkcje fizyczne i psychiczne': [
                     comm.register(ss, de, '\\newpage'),
                 ]
