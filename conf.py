@@ -1,10 +1,11 @@
+import numpy as np
 import os
 from typing import TypeVar
+
 
 import pandas as pd
 import seaborn as sns
 
-from alias import c
 from classificators import BMI_ranges, age_binding
 from custom import fix_places
 
@@ -42,6 +43,8 @@ tex_config = {
         "table" : template("table.tex"),
         "desctable" : template("desctable.tex"),
         "powertable" : template("desctable.tex"),
+        "corrtable" : template("desctable.tex"),
+        "autostatable" : template("desctable.tex"),
         "counttable" : template("desctable.tex"),
         "expandtable" : template("desctable.tex"),
         "crosstable" : template("desctable.tex"),
@@ -200,7 +203,7 @@ metric_col = [
     "Wzrost [cm]",
     "Masa ciała [kg]",
     "Wartość BMI",
-    #    "BMI",
+    "BMI",
 ]
 
 
@@ -272,7 +275,41 @@ tmp2 = [
 cross = []
 
 
-def structure(comm : T):
+def corr_tab(cr):
+    try:
+        cr = cr.pivot_table(index='group', columns='value', values=['corr', 'p'])
+    except:
+        print('Failed to gen corr')
+        return pd.DataFrame()
+    finally:
+        return cr.stack(0).unstack(1)
+
+
+def tests_tab(ddf):
+    tests = list(ddf.value_counts('tname').index)
+    groups = list(ddf.value_counts('groups').index)
+    tables = []
+    for test in tests:
+        for group in groups:
+            try:
+                df = ddf[(ddf['tname'] == test) & (ddf['groups'] == group)].reset_index()
+                cols = df['fixed_col'].iloc[0]
+                v = [df['values'].to_list()] + list(np.array(df['headers'].to_list()).T)
+                gr = ['grupy'] + df['data'].iloc[0]
+                d1 = ', '.join(df['data'].iloc[0][:2])
+                d2 = ', '.join(df['data'].iloc[0][-3:])
+
+                tab = pd.DataFrame(dict(zip(gr, v)))
+                caption = "Test {} dla kolumny {}. $Q$ i $IRQ$ to kolejno mediana oraz rozstęp międzykwartylowy, {} - Wartość statystyki, p-value oraz wskaźnik siły efektu".format(
+                    test, group, d1, d2)
+                tables.append(tab)
+            except:
+                print('failed to gen stats')
+
+    return tables
+
+
+def structure(comm : T, df, make_stat, power):
     """Define report structure."""
     ff = "file"
     ll = "load"
@@ -312,7 +349,7 @@ def structure(comm : T):
                 comm.register(gg, 'powerplot', "None"),  # TODO SUMMARY STAT
                 comm.register(ss, de, '\\newpage'),
             ],
-            },
+        },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
@@ -372,7 +409,7 @@ def structure(comm : T):
                 comm.register(gd, de, "aktfrm", mode=xg, alias='aktfrD'),
                 comm.register(ss, de, '\\newpage'),
             ],
-            },
+        },
         "Przegląd wyników ankiety" : {
             "Zatrudnienie i warunki pracy" : [
                 comm.register(gg, cot, "Staż pracy", mode=xg, alias='stazp'),
@@ -452,7 +489,7 @@ def structure(comm : T):
                 comm.register(ss, de, '\\newpage'),
 
             ],
-            },
+        },
         # metric_col, pain_col
         # metric - inpact
 
@@ -469,29 +506,35 @@ def structure(comm : T):
                 "Charakterystyka bólu" : [
                     comm.register(ff, de, "analysis.tex", loc='pre'),
                     comm.register(ss, de, '\\newpage'),
-                ],
+                ]
+                + make_stat(comm, df, metric_col, pain_col, power, xu),
                 'Wpływ na funkcje fizyczne i psychiczne': [
                     comm.register(ss, de, '\\newpage'),
                 ]
+                + make_stat(comm, df, metric_col, inpact_col, power, xu),
             },
             "Znaczenie uwarunkowań socjo-demograficznych" : {
                 'Warunki socjalne a ból' : [
                     comm.register(ss, de, '\\newpage'),
-                ],
+                ]
+                + make_stat(comm, df, socjo_col, pain_col + inpact_col, power, xu),
                 'Znaczenie zatrudnienia' : [
                     comm.register(ss, de, '\\newpage'),
-                ],
+                ]
+                + make_stat(comm, df, job_col, pain_col + inpact_col, power, xu),
             },
             "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [
                 comm.register(ss, de, '\\newpage'),
-            ],
+            ]
+                + make_stat(comm, df, pain_col, inpact_col, xg),
             "Rola aktywności fizycznej" : [
                 comm.register(ss, de, '\\newpage'),
-            ],
-            },
+            ]
+                + make_stat(comm, df, activity_col, pain_col + inpact_col, power, xu),
+        },
         "Wnioski" : [
             comm.register(ss, de, 'TODO'),
-            ],
+        ],
     }
     return tex_structure
 
