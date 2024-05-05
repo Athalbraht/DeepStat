@@ -289,6 +289,10 @@ def structure(comm : T):
     xp = "paraphrase"   # paraphrase existing description
 
     tex_structure = {
+        "Wstęp" :
+            {
+                comm.register(ff, de, "doc.tex", mode='safe'),
+            },
         "Metodyka Badań" : {
             "Pytania badawcze" : [
                 comm.register(ff, de, "methods.tex", loc='pre', mode=xs),
@@ -301,7 +305,7 @@ def structure(comm : T):
                 comm.register(gg, 'powerplot', "None"),  # TODO SUMMARY STAT
                 comm.register(ss, de, '\\newpage'),
             ],
-        },
+            },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
@@ -326,9 +330,9 @@ def structure(comm : T):
                     comm.register(gg, cot, "BMI", mode=xg, alias='CBMI'),
                     comm.register(gd, de, "CBMI", mode=xg, alias='CBMID'),
                     comm.register(ss, de, '\\newpage'),
-                    # comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
+                    comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
                     comm.register(ss, de, 'TODO'),
-                    # comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga'),
+                    comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga'),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
@@ -357,7 +361,7 @@ def structure(comm : T):
                 comm.register(gd, de, "aktfrm", mode=xg, alias='aktfrD'),
                 comm.register(ss, de, '\\newpage'),
             ],
-        },
+            },
         "Przegląd wyników ankiety" : {
             "Występowanie bólu kręgosłupa" : [
                 comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", mode=xg, alias='boldawno'),
@@ -429,7 +433,7 @@ def structure(comm : T):
                 comm.register(ss, de, '\\newpage'),
 
             ],
-        },
+            },
         "Analiza danych" : {
             "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : {
                 "Charakterystyka bólu" : [
@@ -454,10 +458,10 @@ def structure(comm : T):
             "Rola aktywności fizycznej" : [
                 comm.register(ss, de, '\\newpage'),
             ],
-        },
+            },
         "Wnioski" : [
             comm.register(ss, de, 'TODO'),
-        ],
+            ],
     }
     return tex_structure
 
