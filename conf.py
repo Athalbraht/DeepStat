@@ -73,10 +73,10 @@ tex_config = {
         "options" : "",
     },
     "ai" : {
-        'mode' : 'safe',
+        'mode' : 'static',
         'model' : "gpt-3.5-turbo-0125",
         # 'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
-        'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp. Jeśli chcesz coś wypnktować, używaj formatowania LaTex"
+        'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp. Jeśli chcesz coś wypnktować, używaj formatowania LaTex, czasem możesz dostać tabele w markdown, żeby opisać coś więcej co w niej widzisz. W odpowiedzi dawaj tylko tekst, bez prób dawania mi tablel."
     }
 
 }
@@ -304,7 +304,7 @@ def tests_tab(ddf):
                     test, group, d1, d2)
                 tables.append(tab)
             except:
-                print('failed to gen stats')
+                print('failed to gen stats {} {}'.format(test, group))
 
     return tables
 
@@ -326,7 +326,7 @@ def structure(comm : T, df, make_stat, power):
     crt = "crosstable"
     fp = 'prompt'
 
-    xr = "random"       # choice randomly from database
+    xr = "reload"       # choice randomly from database
     xu = "uniqe"        # always regenerate description
     xg = "global"       # use global setting
     xs = "static"       # AI support disabled, using default values
@@ -335,206 +335,195 @@ def structure(comm : T, df, make_stat, power):
     tex_structure = {
         "Wstęp" :
             {
-                comm.register(ff, de, "doc.tex", mode='safe'),
+                comm.register(ff, de, "doc.tex", mode=xr),
             },
         "Metodyka Badań" : {
             "Pytania badawcze" : [
-                comm.register(ff, de, "methods.tex", loc='pre', mode=xs),
-                comm.register(ff, de, "questions.tex", mode=xs),
+                comm.register(ff, de, "methods.tex", loc='pre'),
+                comm.register(ff, de, "questions.tex"),
             ],
             "Metoda statystyczna" : [
-                comm.register(ff, de, "methods.tex"),  # TODO SUMMARY STAT
-                comm.register(gg, 'powertable', "None", alias='powertab'),  # TODO SUMMARY STAT
-                comm.register(gd, de, "powertab", mode=xg, alias='powertabD'),
-                comm.register(gg, 'powerplot', "None"),  # TODO SUMMARY STAT
+                comm.register(ff, de, "stats.tex"),  # TODO SUMMARY STAT
+                comm.register(gg, 'powertable', "None", alias='powertab', mode=xr),  # TODO SUMMARY STAT
+                comm.register(gd, de, "powertab", alias='powertabD'),
+                comm.register(gg, 'powerplot', "None", mode=xr),  # TODO SUMMARY STAT
                 comm.register(ss, de, '\\newpage'),
             ],
-        },
+                },
         "Dane metryczne" : {
             "Metryka" : {
                 "Płeć" : [
                     comm.register(ff, de, "metric.tex", loc='pre'),
-                    comm.register(gg, det, metric_col, loc='pre', mode=xg, alias='metricN'),
-                    comm.register(gd, de, "metricN", loc='pre', mode=xg, alias='metricND'),
+                    comm.register(gg, det, metric_col, loc='pre', alias='metricN', mode=xr),
+                    comm.register(gd, de, "metricN", loc='pre', alias='metricND'),
 
                     comm.register(ss, de, '\\newpage'),
-                    comm.register(gd, de, "Plec", mode=xg, alias='PlecD'),
-                    comm.register(gg, cot, "Płeć", mode=xg, alias='Plec'),
+                    comm.register(gd, de, "Plec", alias='PlecD'),
+                    comm.register(gg, cot, "Płeć", alias='Plec', mode=xr),
                 ],
                 "Wiek" : [
-                    comm.register(gg, pl, ["Wiek"], alias='Wiek', plot={'hue': "Płeć"}),
+                    comm.register(gg, pl, ["Wiek"], alias='Wiek', plot={'hue': "Płeć"}, mode=xr),
                     comm.register(ss, de, 'Na potrzeby analizy, ankieterzy podzieleni zostali na kilka grup wiekowych (co 10 lat):'),
-                    comm.register(gg, cot, "Kategoria wiekowa", mode=xg, alias='CAge'),
+                    comm.register(gg, cot, "Kategoria wiekowa", alias='CAge', mode=xr),
                     comm.register(ss, de, '\\newpage'),
-                    comm.register(gd, de, "CAge", mode=xg, alias='CAgeD'),
+                    comm.register(gd, de, "CAge", alias='CAgeD'),
                 ],
                 "BMI i wzrost" : [
-                    comm.register(gg, det, ['Wzrost [cm]'], mode=xg, alias='WzrostN', silent=True),
-                    comm.register(gd, de, "WzrostN", mode=xg, alias='WzrostND'),
-                    comm.register(gg, pl, ["Płeć", "Wzrost [cm]"], alias='plec-wzrost'),
+                    comm.register(gg, det, ['Wzrost [cm]'], alias='WzrostN', silent=True, mode=xr),
+                    comm.register(gd, de, "WzrostN", alias='WzrostND'),
+                    comm.register(gg, pl, ["Płeć", "Wzrost [cm]"], alias='plec-wzrost', mode=xr),
                     # comm.register(gg, pl, ["Kategoria wiekowa", "Wzrost [cm]"], alias='wiek-wzrost'),
-                    comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga'),
-                    comm.register(gd, de, "CBMI", mode=xg, alias='CBMID'),
-                    comm.register(gg, cot, "BMI", mode=xg, alias='CBMI'),
-                    comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi'),
+                    comm.register(gg, pl, ["Masa ciała [kg]", "Wzrost [cm]"], alias='wzrost-waga', mode=xr),
+                    comm.register(gd, de, "CBMI", alias='CBMID'),
+                    comm.register(gg, cot, "BMI", alias='CBMI', mode=xr),
+                    comm.register(gg, pl, ["Wartość BMI", "Wzrost [cm]"], alias='wzrost-bmi', mode=xr),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
             "Warunki socjodemograficzne" : {
                 "Miejsce zamieszkania" : [
-                    comm.register(gg, cot, "Miejsce zamieszkania", mode=xg, alias='zamieszkanie'),
-                    comm.register(gd, de, "zamieszkanie", mode=xg, alias='zamieszkanieD'),
-                    comm.register(gg, pl, ["Płeć"], alias='miejscezamieszkaniaplot', plot={'hue': 'Miejsce zamieszkania'}),
+                    comm.register(gg, cot, "Miejsce zamieszkania", alias='zamieszkanie', mode=xr),
+                    comm.register(gd, de, "zamieszkanie", alias='zamieszkanieD'),
+                    comm.register(gg, pl, ["Płeć"], alias='miejscezamieszkaniaplot', plot={'hue': 'Miejsce zamieszkania'}, mode=xr),
                     comm.register(ss, de, '\\newpage'),
                 ],
                 "Stan cywilny" : [
-                    comm.register(gg, cot, "Stan cywilny", mode=xg, alias='stanc'),
-                    comm.register(gd, de, "stanc", mode=xg, alias='stancD'),
-                    comm.register(gg, pl, ["Stan cywilny"], alias='stancywilnypolot', plot={'hue': 'Płeć'}),
+                    comm.register(gg, cot, "Stan cywilny", alias='stanc, mode=xr'),
+                    comm.register(gd, de, "stanc", alias='stancD'),
+                    comm.register(gg, pl, ["Stan cywilny"], alias='stancywilnypolot', plot={'hue': 'Płeć'}, mode=xr),
                     comm.register(ss, de, '\\newpage'),
                 ],
             },
             "Aktywność fizyczna" : [
-                comm.register(gg, cot, "Aktywność fizyczna", mode=xg, alias='aktf'),
-                comm.register(gd, de, "aktf", mode=xg, alias='aktfD'),
-                comm.register(gg, pl, ["Aktywność fizyczna"], alias='aktfplot', plot={'hue': 'Płeć'}),
+                comm.register(gg, cot, "Aktywność fizyczna", alias='aktf', mode=xr),
+                comm.register(gd, de, "aktf", alias='aktfD'),
+                comm.register(gg, pl, ["Aktywność fizyczna"], alias='aktfplot', plot={'hue': 'Płeć'}, mode=xr),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Ile minut aktywności fiz. w tyg.", mode=xg, alias='aktfm'),
-                comm.register(gd, de, "aktfm", mode=xg, alias='aktfmD'),
-                comm.register(gg, pl, ["Aktywność fizyczna", 'Wartość BMI'], alias='aktfplot'),
+                comm.register(gg, cot, "Ile minut aktywności fiz. w tyg.", alias='aktfm', mode=xr),
+                comm.register(gd, de, "aktfm", alias='aktfmD'),
+                comm.register(gg, pl, ["Aktywność fizyczna", 'Wartość BMI'], alias='aktfplot', mode=xr),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, ext, "Rodzaj aktywności fizycznej", mode=xg, alias='aktfrm'),
-                comm.register(gd, de, "aktfrm", mode=xg, alias='aktfrD'),
+                comm.register(gg, ext, "Rodzaj aktywności fizycznej", alias='aktfrm', mode=xr),
+                comm.register(gd, de, "aktfrm", alias='aktfrD'),
                 comm.register(ss, de, '\\newpage'),
             ],
-        },
+                },
         "Przegląd wyników ankiety" : {
             "Zatrudnienie i warunki pracy" : [
-                comm.register(gg, cot, "Staż pracy", mode=xg, alias='stazp'),
-                comm.register(gd, de, "stazp", mode=xg, alias='stazpD'),
+                comm.register(gg, cot, "Staż pracy", alias='stazp', mode=xr),
+                comm.register(gd, de, "stazp", alias='stazpD'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Oddział", mode=xg, alias='odd'),
-                comm.register(gd, de, "odd", mode=xg, alias='oddD'),
+                comm.register(gg, cot, "Oddział", alias='odd', mode=xr),
+                comm.register(gd, de, "odd", alias='oddD'),
                 comm.register(ss, de, 'Na potrzeby analizy przynależność do oddziałów została przegrupowana na mniejsze kategorie przy założeniu, że w każdej grupie powinno znajdować się co najmniej 5 osób. Rodzaje oddziałów przedstawione zostały w poniższej tabeli.'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Rodzaj oddziału", mode=xg, alias='oddR'),
-                comm.register(gd, de, "oddR", mode=xg, alias='oddRD'),
+                comm.register(gg, cot, "Rodzaj oddziału", alias='oddR', mode=xr),
+                comm.register(gd, de, "oddR", alias='oddRD'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Godziny przepracowane w tygodniu", mode=xg, alias='godzt'),
-                comm.register(gd, de, "godzt", mode=xg, alias='godztD'),
+                comm.register(gg, cot, "Godziny przepracowane w tygodniu", alias='godzt', mode=xr),
+                comm.register(gd, de, "godzt", alias='godztD'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Prawidłowa postawa ciała w pracy", mode=xg, alias='postawa'),
-                comm.register(gd, de, "postawa", mode=xg, alias='postawaD'),
-                comm.register(gg, pl, ["Prawidłowa postawa ciała w pracy"], alias='postawaplot', plot={"hue": "Płeć"}),
+                comm.register(gg, cot, "Prawidłowa postawa ciała w pracy", alias='postawa', mode=xr),
+                comm.register(gd, de, "postawa", alias='postawaD'),
+                comm.register(gg, pl, ["Prawidłowa postawa ciała w pracy"], alias='postawaplot', plot={"hue": "Płeć"}, mode=xr),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Możliwość planowania przerw", mode=xg, alias='planowanieprzerw'),
-                comm.register(gd, de, "planowanieprzerw", mode=xg, alias='planowanieprzerwD'),
-                comm.register(ss, de, '\\newpage'),
-
-
-                comm.register(gg, cot, "Praca pod presją czasu", mode=xg, alias='presja'),
-                comm.register(gd, de, "presja", mode=xg, alias='presjaD'),
+                comm.register(gg, cot, "Możliwość planowania przerw", alias='planowanieprzerw', mode=xr),
+                comm.register(gd, de, "planowanieprzerw", alias='planowanieprzerwD'),
                 comm.register(ss, de, '\\newpage'),
 
 
-                comm.register(gg, cot, tmp1, mode=xg, alias='tmp1'),
-                comm.register(gd, de, "tmp1", mode=xg, alias='tmp1D'),
+                comm.register(gg, cot, "Praca pod presją czasu", alias='presja', mode=xr),
+                comm.register(gd, de, "presja", alias='presjaD'),
                 comm.register(ss, de, '\\newpage'),
 
 
-                comm.register(gg, ext, "Aktywności poza pracą", mode=xg, alias='aktywnoscpoza'),
-                comm.register(gd, de, "aktywnoscpoza", mode=xg, alias='aktywnoscpozaD'),
+                comm.register(gg, cot, tmp1, alias='tmp1', mode=xr),
+                comm.register(gd, de, "tmp1", alias='tmp1D'),
+                comm.register(ss, de, '\\newpage'),
+
+
+                comm.register(gg, ext, "Aktywności poza pracą", alias='aktywnoscpoza', mode=xr),
+                comm.register(gd, de, "aktywnoscpoza", alias='aktywnoscpozaD'),
                 comm.register(ss, de, '\\newpage'),
             ],
             "Występowanie bólu kręgosłupa" : [
-                comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", mode=xg, alias='boldawno'),
-                comm.register(gd, de, "boldawno", mode=xg, alias='boldawnoD'),
-                comm.register(gg, pl, ["Płeć"], alias='odjakdawnaplot', plot={'hue': 'Od jak dawna wyst. epizody bólowe'}),
+                comm.register(gg, cot, "Od jak dawna wyst. epizody bólowe", alias='boldawno', mode=xr),
+                comm.register(gd, de, "boldawno", alias='boldawnoD'),
+                comm.register(gg, pl, ["Płeć"], alias='odjakdawnaplot', plot={'hue': 'Od jak dawna wyst. epizody bólowe'}, mode=xr),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, "Częstotliwość bólu", mode=xg, alias='bolF'),
-                comm.register(gd, de, "bolF", mode=xg, alias='bolFD'),
+                comm.register(gg, cot, "Częstotliwość bólu", alias='bolF', mode=xr),
+                comm.register(gd, de, "bolF", alias='bolFD'),
                 comm.register(ss, de, '\\newpage'),
 
                 comm.register(ss, de, 'Poniższa para histogramów przedstawia rozkład ocen bólu w skali VAS w korelacji z wiekiem ankietowanego. '),
-                comm.register(gg, pl, ["Ból VAS", "Wiek"], alias='vaswiekplot'),
-                comm.register(gg, pl, ["Ból VAS"], alias='VAS'),
-                comm.register(gg, det, ['Ból VAS'], mode=xg, alias='vasN', silent=True),
-                comm.register(gd, de, "vasN", mode=xg, alias='vasND'),
+                comm.register(gg, pl, ["Ból VAS", "Wiek"], alias='vaswiekplot', mode=xr),
+                comm.register(gg, pl, ["Ból VAS"], alias='VAS', mode=xr),
+                comm.register(gg, det, ['Ból VAS'], alias='vasN', silent=True, mode=xr),
+                comm.register(gd, de, "vasN", alias='vasND'),
                 # acomm.register(ss, de, ''),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, ext, "Charakter bólu", mode=xg, alias='bolcharakter'),
-                comm.register(gd, de, "bolcharakter", mode=xg, alias='bolcharakterD'),
+                comm.register(gg, ext, "Charakter bólu", alias='bolcharakter', mode=xr),
+                comm.register(gd, de, "bolcharakter", alias='bolcharakterD'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, ext, "Kiedy ból mija", mode=xg, alias='kiedymija'),
-                comm.register(gd, de, "kiedymija", mode=xg, alias='kiedymijaD'),
+                comm.register(gg, ext, "Kiedy ból mija", alias='kiedymija', mode=xr),
+                comm.register(gd, de, "kiedymija", alias='kiedymijaD'),
                 comm.register(ss, de, '\\newpage'),
             ],
             "Wpływ bólu na fizyczne i psychiczne aspekty życia" : [
-                comm.register(gg, ext, "Utrudnienia w ruchu podczas bólu w czynnościach:", mode=xg, alias='utrudnieniaruchu'),
-                comm.register(gd, de, "utrudnieniaruchu", mode=xg, alias='utrudnieniaruchuD'),
+                comm.register(gg, ext, "Utrudnienia w ruchu podczas bólu w czynnościach:", alias='utrudnieniaruchu', mode=xr),
+                comm.register(gd, de, "utrudnieniaruchu", alias='utrudnieniaruchuD'),
                 comm.register(ss, de, '\\newpage'),
 
-                comm.register(gg, cot, tmp2, mode=xg, alias='tmp2'),
-                comm.register(gd, de, "tmp2", mode=xg, alias='tmp2D'),
+                comm.register(gg, cot, tmp2, alias='tmp2', mode=xr),
+                comm.register(gd, de, "tmp2", alias='tmp2D'),
                 comm.register(ss, de, '\\newpage'),
 
             ],
-        },
-        # metric_col, pain_col
-        # metric - inpact
-
-        # socjo_col - pain_col
-        # socjo_col - inpact_col
-        # job_col - pain_col
-        # job_col - inpact_col
-        # activity_col - pain_col
-        # activity_col - inpact_col
-
-        # pain_col - inpact_col
+                },
         "Analiza danych" : {
             "Związek występowania bólu kręgosłupa z wskaźnikami antropometrycznymi" : {
                 "Charakterystyka bólu" : [
                     comm.register(ff, de, "analysis.tex", loc='pre'),
                     comm.register(ss, de, '\\newpage'),
                 ]
-r               + make_stat(comm, df, metric_col, pain_col, power, xu),
+                + make_stat(comm, df, metric_col, pain_col, power, xg),
                 'Wpływ na funkcje fizyczne i psychiczne': [
                     comm.register(ss, de, '\\newpage'),
                 ]
-                + make_stat(comm, df, metric_col, inpact_col, power, xu),
+                + make_stat(comm, df, metric_col, inpact_col, power, xg),
             },
             "Znaczenie uwarunkowań socjo-demograficznych" : {
                 'Warunki socjalne a ból' : [
                     comm.register(ss, de, '\\newpage'),
                 ]
-                + make_stat(comm, df, socjo_col, pain_col + inpact_col, power, xu),
+                + make_stat(comm, df, socjo_col, pain_col + inpact_col, power, xg),
                 'Znaczenie zatrudnienia' : [
                     comm.register(ss, de, '\\newpage'),
                 ]
-                + make_stat(comm, df, job_col, pain_col + inpact_col, power, xu),
+                + make_stat(comm, df, job_col, pain_col + inpact_col, power, xg),
             },
             "Wpływ bólu kręgosłupa na upośledzenie funkcji fizycznych i psychicznych" : [
                 comm.register(ss, de, '\\newpage'),
             ]
-                + make_stat(comm, df, pain_col, inpact_col, xg),
+                + make_stat(comm, df, pain_col, inpact_col, power, xg),
             "Rola aktywności fizycznej" : [
                 comm.register(ss, de, '\\newpage'),
             ]
-                + make_stat(comm, df, activity_col, pain_col + inpact_col, power, xu),
-        },
+                + make_stat(comm, df, activity_col, pain_col + inpact_col, power, xg),
+                },
         "Wnioski" : [
             comm.register(ss, de, 'TODO'),
-        ],
+                ],
     }
     return tex_structure
 
