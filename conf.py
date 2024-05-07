@@ -9,7 +9,7 @@ import seaborn as sns
 from classificators import BMI_ranges, age_binding
 from custom import fix_places
 
-sns.set_theme(style="whitegrid", rc={"figure.figsize": (14, 8), "axes.labelsize": 15})
+sns.set_theme(style="whitegrid", palette="pastel",rc={"figure.figsize": (14, 8), "axes.labelsize": 15})
 sns_api = {"height": 6, "aspect": 1.75}
 pic_path = "report/assets"
 pic_ext = ".pdf"
@@ -73,7 +73,7 @@ tex_config = {
         "options" : "",
     },
     "ai" : {
-        'mode' : 'static',
+        'mode' : 'safe',
         'model' : "gpt-3.5-turbo-0125",
         # 'system': "Jesteś statystykiem który pisze raport statystyczny na temat występowaniu bólu kręgosłupa u pielegniarek i jak to wpływa na ich życie, tworzysz opisy do tabel i wykresów, nie przekraczaj 300 słów, nie sugeruj nic, ma być ściśle, po prostu opisuj to co widzisz w tabeli, np. dostajesz informacje że tabela to odpowiedzi na jakies pytanie i twoim zadaniem jest tylko opisać tą tabele np. średni wzrost w grupie to X, odchylenie Y, najszęsciej występuje odpowiedz C itp. NIE zaczynaj zdania od przykładowo 'w badaniiu przeprowadzonym na grupie pielegniarek...' odrazu pisz o wartosciach z tabeli, bez żadnych wstępów",
         'system': "Udawaj, że jesteś naukowcem, postaraj się parafrazować wysyłane ci zdania w bardziej profesjonalny styl, Odmieniaj odpowienio nazwy zmiennych np. 'tabela krzyżowa między wartością (Kategoria wiekowa) a (Czy przerwy w pracy są wystarczające) zawiera X'  na 'w tabeli krzyżowej zawierającej kategorie wiekową respondentów w stosunku do pytania o wystarczające przerwy w pracy znajduje się X' itp. Jeśli chcesz coś wypnktować, używaj formatowania LaTex, czasem możesz dostać tabele w markdown, żeby opisać coś więcej co w niej widzisz. W odpowiedzi dawaj tylko tekst, bez prób dawania mi tablel."
@@ -277,7 +277,7 @@ cross = []
 
 def corr_tab(cr):
     try:
-        cr = cr.pivot_table(index='group', columns='value', values=['corr', 'p'])
+        cr = cr.pivot_table(index='X', columns='Y', values=['$\\rho$', 'p'])
     except:
         print('Failed to gen corr')
         return pd.DataFrame()
@@ -357,7 +357,8 @@ def structure(comm : T, df, make_stat, power):
                     comm.register(gg, det, metric_col, loc='pre', alias='metricN', mode=xr),
                     comm.register(gd, de, "metricN", loc='pre', alias='metricND'),
 
-                    comm.register(ss, de, '\\newpage'),
+                    comm.register(ss, de, '\\newpage',loc='pre'),
+
                     comm.register(gd, de, "Plec", alias='PlecD'),
                     comm.register(gg, cot, "Płeć", alias='Plec', mode=xr),
                 ],
@@ -522,7 +523,7 @@ def structure(comm : T, df, make_stat, power):
                 + make_stat(comm, df, activity_col, pain_col + inpact_col, power, xg),
                 },
         "Wnioski" : [
-            comm.register(ss, de, 'TODO'),
+                comm.load_summary('Znaczące od strony statystycznej fakty wynikające z uzyskanej analizy przedstawiają się następująco:'),
                 ],
     }
     return tex_structure
