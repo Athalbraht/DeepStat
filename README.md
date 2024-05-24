@@ -12,3 +12,23 @@ See [documentation](https://aszadzinski.github.io/deepstat/). Still in **BETA** 
 
 
 ---
+
+## Installation
+
+### From source
+
+```console
+# Using poetry
+user@host:~$ poetry install --without test 
+# or using pip
+user@host:~$ pip install --without test 
+```
+
+
+### From PYPI
+
+```console
+user@host:~$ pip install deepstat
+```
+
+
